@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Rifa de Celular</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    #login {
+      margin-top: 20px;
+      padding: 0px 0px 20px 0px;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+      gap: 8px;
+      max-width: 900px;
+      margin: 20px auto;
+      display: none;
+    }
+    .numero {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+    }
+    .vendido {
+      background: #ddd;
+      color: red;
+      text-decoration: line-through;
+      pointer-events: none;
+    }
+    .admin .numero {
+      pointer-events: auto;
+    }
+    .admin .vendido {
+      background: #fcc;
+      color: #a00;
+      text-decoration: line-through;
+      pointer-events: auto;
+    }
+    #logout {
+      display: none;
+      margin-bottom: 20px;
+    }
+
+    #imagen-fija {
+     position: fixed;
+    right: 20px;
+    bottom: 20px;
+     width: 300px; /* Ajusta el tamaño */
+    height: auto;
+     z-index: 1000;
+   }
+
+  </style>
+
+  <script>
+  const maxFlores = 20;
+  const floresActivas = [];
+
+  function crearFlor() {
+    if (floresActivas.length >= maxFlores) return;
+
+    const flor = document.createElement("div");
+    flor.textContent = "🌸";
+    flor.style.position = "fixed";
+    flor.style.top = "-30px";
+    flor.style.left = `${Math.random() * 100}%`;
+    flor.style.fontSize = `${Math.random() * 20 + 20}px`;
+    flor.style.opacity = 0.8;
+    flor.style.pointerEvents = "none";
+    flor.style.zIndex = 0;
+    flor.style.transition = `transform 10s linear, opacity 10s ease-out`;
+    document.body.appendChild(flor);
+    floresActivas.push(flor);
+
+    requestAnimationFrame(() => {
+      flor.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`;
+      flor.style.opacity = 0;
+    });
+
+    setTimeout(() => {
+      flor.remove();
+      const index = floresActivas.indexOf(flor);
+      if (index !== -1) floresActivas.splice(index, 1);
+    }, 10000);
+  }
+
+  // Crea flores lentamente
+  setInterval(crearFlor, 2000);
+</script>
+
+
+
+</head>
+<body>
+
+  <div id="login">
+    <p>Ingresa la contraseña para administrar:</p>
+    <input type="password" id="passwordInput" placeholder="Contraseña">
+    <button onclick="login()">Entrar</button>
+  </div>
+
+  <div id="logout">
+    <button onclick="logout()">Cerrar sesión</button>
+  </div>
+
+  <img src="https://i.postimg.cc/XYzZm8xZ/rifa.png">
+
+  <div id="grid"></div>
+
+
+
+  <script>
+    const totalNumeros = 999;
+    const grid = document.getElementById("grid");
+    const password = "Yeffer1996.r"; // Cambia esta contraseña
+    const vendidos = new Set(JSON.parse(localStorage.getItem("vendidos") || "[]"));
+    let isAdmin = false;
+
+    function formatNumber(num) {
+      return num.toString().padStart(3, '0');
+    }
+
+    function renderGrid() {
+      grid.innerHTML = "";
+      for (let i = 1; i <= totalNumeros; i++) {
+        const n = formatNumber(i);
+        const div = document.createElement("div");
+        div.textContent = n;
+        div.classList.add("numero");
+        if (vendidos.has(n)) div.classList.add("vendido");
+        if (isAdmin) {
+          div.onclick = () => {
+            if (vendidos.has(n)) {
+              vendidos.delete(n);
+            } else {
+              vendidos.add(n);
+            }
+            localStorage.setItem("vendidos", JSON.stringify([...vendidos]));
+            renderGrid();
+          };
+        }
+        grid.appendChild(div);
+      }
+      if (isAdmin) {
+        document.body.classList.add("admin");
+        document.getElementById("logout").style.display = "block";
+      } else {
+        document.body.classList.remove("admin");
+        document.getElementById("logout").style.display = "none";
+      }
+    }
+
+    function login() {
+      const input = document.getElementById("passwordInput");
+      if (input.value === password) {
+        isAdmin = true;
+        document.getElementById("login").style.display = "none";
+        grid.style.display = "grid";
+        renderGrid();
+      } else {
+        alert("Contraseña incorrecta");
+      }
+    }
+
+    function logout() {
+      isAdmin = false;
+      document.getElementById("login").style.display = "block";
+      grid.style.display = "grid";
+      renderGrid();
+    }
+
+    window.onload = () => {
+      renderGrid();
+      grid.style.display = "grid";
+    };
+  </script>
+
+  
+  <img src="https://i.postimg.cc/KjWf7rbS/dsdds.png" alt="Imagen fija" id="imagen-fija">
+
+
+  <footer style="width: 1000px; margin: 0 auto;">
+    
+    <h2 style="font-family: verdana; color: #ffffff; margin-top: 50px; background: linear-gradient(to bottom, #b797da, #5f58a2); padding: 50px 0px 50px 0px; width: 1920; position: static; text-align: center;">
+      
+      No sabemos lo fuertes que somos hasta que ser <br> fuertes es la única opción que tenemos. <br> <br>
+
+      ¡Gracias!
+    </h2>
+  </footer>
+  
+
+</body>
+</html>
